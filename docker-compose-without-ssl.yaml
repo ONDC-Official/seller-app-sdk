@@ -2,107 +2,111 @@ version: '2'
 
 services:
 
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
-
-  mmi-client:
-    image: navdeep710/ondc-ancillary-services:v3
-    container_name: map-client
+  bpp-protocol-webserver:
+    build:
+      context: seller-app-protocol
+      dockerfile: dockerfile
+    container_name: bpp-protocol-webserver
+    depends_on:
+      - rabbitmq
     environment:
       ENV: prod
-      MMI_CLIENT_ID: ${MMI_CLIENT_ID}
-      MMI_CLIENT_SECRET: ${MMI_CLIENT_SECRET}
-      MMI_ADVANCE_API_KEY: ${MMI_ADVANCE_API_KEY}
-      KNOWLARITY_NUMBER: ${KNOWLARITY_NUMBER}
-      KNOWLARITY_AGENT_NUMBER: ${KNOWLARITY_AGENT_NUMBER}
-      KNOWLARITY_API_KEY: ${KNOWLARITY_API_KEY}
-      KNOWLARITY_AUTHORIZATION_HEADER_KEY: ${KNOWLARITY_AUTHORIZATION_HEADER_KEY}
-    ports:
-      - 8000:8000
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
+      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
+      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_ID: ${BPP_ID}
     expose:
-      - 8000
+      - 5555
+    ports:
+      - 5555:5555
+
+
+  bpp-protocol-consumer:
+    build:
+      context: seller-app-protocol
+      dockerfile: consumer_dockerfile
+    container_name: bpp-protocol-consumer
+    depends_on:
+      - rabbitmq
+    environment:
+      ENV: prod
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
+      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
+      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_ID: ${BPP_ID}
+
+
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+
+  strapi:
+    build:
+      context: seller-app
+      dockerfile: strapiDocker
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_NAME: strapi
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+      DATABASE_SCHEMA: public
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '1338:1337'
+    depends_on:
+      - postgres
+
+  seller:
+    build:
+      context: seller-app
+      dockerfile: sellerApiDocker
+    environment:
+      FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
+      STRAPI_SERVER_URL: strapi
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
+      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
+      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
+      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_ID: ${BPP_ID}
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '3002:3001'
+    depends_on:
+      - strapi
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: strapi
+      POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+    volumes:
+      - ./data:/var/lib/postgresql/data
 
   nginx:
     build:
-      context: biap-app-ui-front
-      dockerfile: DockerfileWithoutSSL
-      args:
-        REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
-        REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
-        REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
-        REACT_APP_GOOGLE_API_KEY: ${REACT_APP_GOOGLE_API_KEY}
-        REACT_APP_JUSTPAY_CLIENT_AND_MERCHANT_KEY: ${REACT_APP_JUSTPAY_CLIENT_AND_MERCHANT_KEY}
-        REACT_APP_MERCHANT_KEY_ID: ${REACT_APP_MERCHANT_KEY_ID}
-        REACT_APP_PAYMENT_SDK_ENV: ${REACT_APP_PAYMENT_SDK_ENV}
-        REACT_APP_PAYMENT_SERVICE_URL: ${REACT_APP_PAYMENT_SERVICE_URL}
-        REGISTRY_BASE_URL: ${REGISTRY_BASE_URL}
-        REACT_APP_MMI_BASE_URL: ${REACT_APP_MMI_BASE_URL}
-    container_name: biap-app-ui-front
-    #    depends_on:
-    #      - biap-bap-client
-    environment:
-      REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
-      REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
-      REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
-      REACT_APP_GOOGLE_API_KEY: ${REACT_APP_GOOGLE_API_KEY}
+      context: bpp-nginx
+      dockerfile: Dockerfile
+    restart: "always"
     depends_on:
-      - mmi-client
-      - biap-client-node-js
-    expose:
-      - 80
+      - strapi
+      - seller
+      - bpp-protocol-webserver
     ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-
-
-  biap-client-node-js:
-    build:
-      context: biap-client-node-js
-      args:
-        JUSPAY_SECRET_KEY_PATH: ${JUSPAY_SECRET_KEY_PATH}
-        JUSPAY_BASE_URL: ${JUSPAY_BASE_URL}
-        JUSPAY_MERCHANT_ID: ${JUSPAY_MERCHANT_ID}
-        JUSPAY_API_KEY: ${JUSPAY_API_KEY}
-        FIREBASE_ADMIN_SERVICE_ACCOUNT: ${FIREBASE_ADMIN_SERVICE_ACCOUNT}
-        ONDC_BASE_API_URL: ${ONDC_BASE_API_URL}
-        JUSPAY_WEBHOOK_USERNAME: ${JUSPAY_WEBHOOK_USERNAME}
-        JUSPAY_WEBHOOK_PASSWORD: ${JUSPAY_WEBHOOK_PASSWORD}
-        DOMAIN: ${DOMAIN}
-        CITY: ${CITY}
-        COUNTRY: ${COUNTRY}
-        BAP_ID: ${BAP_ID}
-        BAP_URL: ${BAP_URL}
-        PROTOCOL_BASE_URL: ${PROTOCOL_BASE_URL}
-        DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
-        BAP_PRIVATE_KEY: ${BAP_PRIVATE_KEY}
-        BAP_PUBLIC_KEY: ${BAP_PUBLIC_KEY}
-        BAP_UNIQUE_KEY_ID: ${BAP_UNIQUE_KEY_ID}
-        PORT: 3000
-        NODE_DEV: dev
-        REGISTRY_BASE_URL: ${REGISTRY_BASE_URL}
-    ports:
-      - 3000:3000
-    expose:
-      - 3000
-    depends_on:
-      - mongo
-
-  py-ondc-protocol:
-    image: navdeep710/ondc-python-protocol-layer:v2
-    container_name: py-ondc-protocol
-    environment:
-      ENV: prod
-      MONGO_DATABASE_HOST: mongo
-      BAP_URL: ${BAP_URL}
-    ports:
-      - 5555:5555
-    expose:
-      - 5555
-
-
+      - "80:80"
+    # - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"

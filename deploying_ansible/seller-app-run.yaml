@@ -17,16 +17,17 @@
       private: no
 
   tasks:
-    - name: Clone biap-client-node-js
-      git:
-        repo: 'https://github.com/Open-network-for-digital-commerce/biap-client-node-js.git'
-        dest: "/home/ubuntu/biap-client-node-js"
-        version: 'master'
+    - name: Clone seller-app(client, strapi)
+        git:
+          repo: "https://github.com/dataorchestration/seller-app.git"
+          dest: "/home/ubuntu/seller-app"
+          version: 'master'
+          force: yes
 
-    - name: Clone biap ui
+    - name: Clone seller-app-protocol
       git:
-        repo: "https://github.com/Open-network-for-digital-commerce/biap-app-ui-front.git"
-        dest: "/home/ubuntu/biap-app-ui-front"
+        repo: "https://github.com/dataorchestration/seller-app-protocol.git"
+        dest: "/home/ubuntu/seller-app-protocol"
         version: 'master'
         force: yes
 
@@ -38,25 +39,25 @@
         group: "ubuntu"
         mode: "0755"
 
-    - name: copy Dockerfile without SSL as dockerfile in biap-app-ui-front
+    - name: copy Dockerfile with ssl as dockerfile in bpp-nginx
       copy:
-        src: "{{ playbook_dir }}/../biap-app-ui-front/Dockerfile"
-        dest: "/home/ubuntu/biap-app-ui-front/Dockerfile"
+        src: "{{ playbook_dir }}/../bpp-nginx/Dockerfile"
+        dest: "/home/ubuntu/bpp-nginx/Dockerfile"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
 
     - name: copy nginx conf with ssl
       copy:
-        src: "{{ playbook_dir }}/../biap-app-ui-front/nginx-replace-with-domain.conf"
-        dest: "/home/ubuntu/biap-app-ui-front/nginx.conf"
+        src: "{{ playbook_dir }}/../bpp-nginx/nginx-replace-with-domain.conf"
+        dest: "/home/ubuntu/bpp-nginx/nginx.conf"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
 
     - name: replace __domain__ with domain name
       replace:
-        path: "/home/ubuntu/biap-app-ui-front/nginx.conf"
+        path: "/home/ubuntu/bpp-nginx/nginx.conf"
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
