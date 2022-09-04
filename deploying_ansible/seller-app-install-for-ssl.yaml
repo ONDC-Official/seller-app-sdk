@@ -20,17 +20,19 @@
   tasks:
     - name: Clone seller-app(client, strapi)
       git:
-        repo: "https://github.com/dataorchestration/seller-app.git"
+        repo: "git@github.com:dataorchestration/seller-app.git"
         dest: "/home/ubuntu/seller-app"
         version: 'master'
         force: yes
+        accept_hostkey: yes
 
     - name: Clone seller-app-protocol
       git:
-        repo: "https://github.com/dataorchestration/seller-app-protocol.git"
+        repo: "git@github.com:dataorchestration/seller-app-protocol.git"
         dest: "/home/ubuntu/seller-app-protocol"
         version: 'master'
         force: yes
+        accept_hostkey: yes
 
     - name: Copy lets encrypt with domain replaced
       copy:
@@ -46,7 +48,15 @@
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
-    - name: copy Dockerfile without SSL as dockerfile in biap-app-ui-front
+    - name: Copy bpp-nginx folder
+      copy:
+        src: "{{ playbook_dir }}/../bpp-nginx"
+        dest: "/home/ubuntu/"
+        owner: "ubuntu"
+        group: "ubuntu"
+        mode: "0755"
+
+    - name: copy Dockerfile without SSL as dockerfile in bpp-nginx
       copy:
         src: "{{ playbook_dir }}/../bpp-nginx/DockerfileWithoutSSL"
         dest: "/home/ubuntu/bpp-nginx/Dockerfile"
@@ -88,4 +98,3 @@
 
     - name: run letsencrypt
       shell: "cd /home/ubuntu/ && sudo ./init-letsencrypt.sh"
-

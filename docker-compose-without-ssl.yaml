@@ -4,7 +4,7 @@ services:
 
   bpp-protocol-webserver:
     build:
-      context: seller-app-protocol
+      context: seller-app-protocol/webserver
       dockerfile: dockerfile
     container_name: bpp-protocol-webserver
     depends_on:
@@ -24,7 +24,7 @@ services:
 
   bpp-protocol-consumer:
     build:
-      context: seller-app-protocol
+      context: seller-app-protocol/webserver
       dockerfile: consumer_dockerfile
     container_name: bpp-protocol-consumer
     depends_on:
@@ -110,3 +110,11 @@ services:
       - "80:80"
     # - "443:443"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    restart: "always"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
