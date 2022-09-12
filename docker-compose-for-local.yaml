@@ -36,6 +36,7 @@ services:
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
 
 
   rabbitmq:
@@ -65,7 +66,7 @@ services:
     volumes:
       - ./app:/srv/app
     ports:
-      - '1338:1337'
+      - '1337:1337'
     depends_on:
       - postgres
 
@@ -75,7 +76,8 @@ services:
       dockerfile: sellerApiDocker
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
-      STRAPI_SERVER_URL: strapi
+      STRAPI_SERVER_URL: http://strapi:1337
+      NODE_ENV: production
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
@@ -84,7 +86,7 @@ services:
     volumes:
       - ./app:/srv/app
     ports:
-      - '3002:3001'
+      - '3001:3001'
     depends_on:
       - strapi
 
