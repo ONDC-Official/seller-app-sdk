@@ -87,11 +87,28 @@
 
     - name: Copy docker-compose file with domain replaced
       copy:
-        src: "{{ playbook_dir }}/../docker-compose-without-ssl.yaml"
+        src: "{{ playbook_dir }}/../docker-compose-for-local.yaml"
         dest: "/home/ubuntu/docker-compose.yml"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
+
+    #sudo chmod -R a+w ~/.docker-conf/rabbitmq/log
+    - name give permissions for rabbitmq
+      file:
+        path: "/home/ubuntu/.docker-conf/rabbitmq/data/"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
+
+    - name give permissions for rabbitmq
+      file:
+        path: "/home/ubuntu/.docker-conf/rabbitmq/data/"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
 
     - name: Run docker compose up
       shell: "cd /home/ubuntu/ && sudo docker-compose build && sudo docker-compose up -d"
