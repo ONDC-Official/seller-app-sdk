@@ -102,7 +102,7 @@ services:
   nginx:
     build:
       context: bpp-nginx
-      dockerfile: Dockerfile
+      dockerfile: DockerfileWithoutSSL
     restart: "always"
     depends_on:
       - strapi
