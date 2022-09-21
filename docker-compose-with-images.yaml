@@ -10,6 +10,10 @@ services:
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
+      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
+      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
+      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_ID: ${BPP_ID}
     expose:
       - 5555
     ports:
@@ -24,6 +28,11 @@ services:
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
+      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
+      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
+      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_ID: ${BPP_ID}
+      BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
 
 
   rabbitmq:
@@ -45,13 +54,13 @@ services:
       DATABASE_NAME: strapi
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
-      DATABASE_USERNAME: strapi
-      DATABASE_PASSWORD: strapi
+      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
       DATABASE_SCHEMA: public
     volumes:
       - ./app:/srv/app
     ports:
-      - '1338:1337'
+      - '1337:1337'
     depends_on:
       - postgres
 
@@ -59,8 +68,13 @@ services:
     image: navdeep710/ondc-seller-app:v1
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
-      STRAPI_SERVER_URL: strapi
-      STRAPI_API_TOKEN: b716212a84567e1870bba07df14ab55a4b771fed217eb7b25dee9116df58835b11dece5c04555fc0c1c84de2673f0a3db16e4e045c76de9f00b9f6f8a8fbaa60138b7a3ade0a26c1753f96fb25a3faf0aaa0e92ceff4d40fc0a00dd613b5fda11562e40b68954f44355914149c572b60dac8e55742369bf9b0e8e10d13bb4262
+      STRAPI_SERVER_URL: http://strapi:1337
+      NODE_ENV: production
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
+      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
+      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
+      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_ID: ${BPP_ID}
     volumes:
       - ./app:/srv/app
     ports:
@@ -72,8 +86,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: strapi
-      POSTGRES_USER: strapi
-      POSTGRES_PASSWORD: strapi
+      POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
     volumes:
       - ./data:/var/lib/postgresql/data
 

@@ -9,7 +9,7 @@
       private: no
 
     - name: domain
-      prompt: please enter the domain which will be serving the requests
+      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in )
       private: no
 
     - name: envtype
@@ -87,14 +87,16 @@
 
     - name: Copy docker-compose file with domain replaced
       copy:
-        src: "{{ playbook_dir }}/../docker-compose-for-local.yaml"
+        src: "{{ playbook_dir }}/../docker-compose-without-ssl.yaml"
         dest: "/home/ubuntu/docker-compose.yml"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
 
+
     #sudo chmod -R a+w ~/.docker-conf/rabbitmq/log
-    - name give permissions for rabbitmq data
+    - name: give permissions for rabbitmq data
+      become: yes
       file:
         path: "/home/ubuntu/.docker-conf/rabbitmq/data/"
         state: directory
@@ -102,7 +104,9 @@
         group: ubuntu
         mode: 0755
 
-    - name give permissions for rabbitmq log
+
+    - name: give permissions for rabbitmq log
+      become: yes
       file:
         path: "/home/ubuntu/.docker-conf/rabbitmq/log/"
         state: directory
