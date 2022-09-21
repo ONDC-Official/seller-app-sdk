@@ -24,7 +24,7 @@
         dest: "/home/ubuntu/seller-app"
         version: 'master'
         force: yes
-        accept_hostkey: yes
+
 
     - name: Clone seller-app-protocol
       git:
@@ -32,7 +32,7 @@
         dest: "/home/ubuntu/seller-app-protocol"
         version: 'master'
         force: yes
-        accept_hostkey: yes
+
 
     - name: Copy lets encrypt with domain replaced
       copy:

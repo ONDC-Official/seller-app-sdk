@@ -9,7 +9,7 @@
       private: no
 
     - name: domain
-      prompt: please enter the domain which will be serving the requests
+      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in )
       private: no
 
     - name: envtype
@@ -30,14 +30,6 @@
         dest: "/home/ubuntu/seller-app-protocol"
         version: 'master'
         force: yes
-
-    - name: Copy config directory
-      copy:
-        src: "{{ playbook_dir }}/../biap-client-node-js/config"
-        dest: "/home/ubuntu/biap-client-node-js/"
-        owner: "ubuntu"
-        group: "ubuntu"
-        mode: "0755"
 
     - name: copy Dockerfile with ssl as dockerfile in bpp-nginx
       copy:
