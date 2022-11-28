@@ -27,7 +27,8 @@ This repo is ONDC Seller App with microservice architecture which contains
 ![](assets/ss3.png)
 8) Get [webhook.site](https://webhook.site/) url to verify if search flow is working
 9) Test by making /search request (Update webhook-url in context)
-```curl --location --request POST 'http://localhost:5555/protocol/v1/search' \
+```
+curl --location --request POST 'http://localhost:5555/protocol/v1/search' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "context": {
@@ -37,7 +38,7 @@ This repo is ONDC Seller App with microservice architecture which contains
         "action": "search",
         "core_version": "0.9.3",
         "bap_id": "buyer-app.ondc.org",
-        "bap_uri": "https://webhook.site/b8c0ef18-f162-417b-95bf-3d62352f271b",
+        "bap_uri": "<webhook_site_url>",
         "transaction_id": "5da3e9f8-75d9-4b69-8a3f-2502a682f90d",
         "message_id": "49e1d86d-1505-4d14-b801-aee9bb5895dc2",
         "timestamp": "2022-05-25T08:01:22.006Z"
