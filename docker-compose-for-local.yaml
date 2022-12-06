@@ -9,6 +9,7 @@ services:
     container_name: bpp-protocol-webserver
     depends_on:
       - rabbitmq
+      - postgres
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
@@ -16,6 +17,12 @@ services:
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      FLASK_SERVER: "True"
     expose:
       - 5555
     ports:
@@ -29,6 +36,7 @@ services:
     container_name: bpp-protocol-consumer
     depends_on:
       - rabbitmq
+      - postgres
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
@@ -37,6 +45,12 @@ services:
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
       BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      FLASK_SERVER: "False"
 
 
   rabbitmq:
@@ -83,12 +97,19 @@ services:
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME_SELLER_CLIENT: ${CLIENT_PG_DATABASE}
+      DATABASE_USERNAME: ${CLIENT_PG_USER}
+      DATABASE_PASSWORD: ${CLIENT_PG_PASSWORD}
     volumes:
       - ./app:/srv/app
     ports:
       - '3001:3001'
     depends_on:
       - strapi
+      - postgres
 
   postgres:
     image: postgres
@@ -97,6 +118,7 @@ services:
       POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
     volumes:
+      - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data:/var/lib/postgresql/data
 
   nginx:
