@@ -3,10 +3,13 @@ version: '2'
 services:
 
   bpp-protocol-webserver:
-    image: navdeep710/ondc-seller-app-protocol-webserver:v1
+    build:
+      context: seller-app-protocol/webserver
+      dockerfile: dockerfile
     container_name: bpp-protocol-webserver
     depends_on:
       - rabbitmq
+      - postgres
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
@@ -14,6 +17,12 @@ services:
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      FLASK_SERVER: "True"
     expose:
       - 5555
     ports:
@@ -21,10 +30,13 @@ services:
 
 
   bpp-protocol-consumer:
-    image: navdeep710/ondc-seller-app-protcol-consumer:v1
+    build:
+      context: seller-app-protocol/webserver
+      dockerfile: consumer_dockerfile
     container_name: bpp-protocol-consumer
     depends_on:
       - rabbitmq
+      - postgres
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
@@ -33,6 +45,12 @@ services:
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
       BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      FLASK_SERVER: "False"
 
 
   rabbitmq:
@@ -48,7 +66,9 @@ services:
 
 
   strapi:
-    image: navdeep710/ondc-seller-app-strapi:v1
+    build:
+      context: seller-app
+      dockerfile: strapiDocker
     environment:
       DATABASE_CLIENT: postgres
       DATABASE_NAME: strapi
@@ -65,7 +85,9 @@ services:
       - postgres
 
   seller:
-    image: navdeep710/ondc-seller-app:v1
+    build:
+      context: seller-app
+      dockerfile: sellerApiDocker
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
       STRAPI_SERVER_URL: http://strapi:1337
@@ -75,12 +97,19 @@ services:
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME_SELLER_CLIENT: ${CLIENT_PG_DATABASE}
+      DATABASE_USERNAME: ${CLIENT_PG_USER}
+      DATABASE_PASSWORD: ${CLIENT_PG_PASSWORD}
     volumes:
       - ./app:/srv/app
     ports:
       - '3002:3001'
     depends_on:
       - strapi
+      - postgres
 
   postgres:
     image: postgres
@@ -89,6 +118,7 @@ services:
       POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
     volumes:
+      - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data:/var/lib/postgresql/data
 
   nginx:
@@ -102,8 +132,8 @@ services:
       - bpp-protocol-webserver
     ports:
       - "80:80"
-    # - "443:443"
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+      - "443:443"
+#    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
