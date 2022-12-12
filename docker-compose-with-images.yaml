@@ -51,6 +51,7 @@ services:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
       FLASK_SERVER: "False"
+      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
 
 
   rabbitmq:

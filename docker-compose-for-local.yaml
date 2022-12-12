@@ -50,6 +50,7 @@ services:
       PG_DATABASE: ${PG_DATABASE}
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
+      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
       FLASK_SERVER: "False"
 
 
