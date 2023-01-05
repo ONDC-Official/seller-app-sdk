@@ -4,3 +4,6 @@
 [submodule "seller-app-protocol"]
 	path = seller-app-protocol
 	url = git@github.com:dataorchestration/seller-app-protocol.git
+[submodule "seller-app-frontend"]
+	path = seller-app-frontend
+	url = git@github.com:dataorchestration/seller-app-frontend.git
