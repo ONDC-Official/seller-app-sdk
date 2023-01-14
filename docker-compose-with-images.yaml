@@ -124,9 +124,17 @@ services:
 
   nginx:
     build:
-      context: bpp-nginx
+      context: seller-app-frontend
       dockerfile: Dockerfile
+      args:
+        REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
+        REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
+        REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
     restart: "always"
+    environment:
+      REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
+      REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
+      REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
     depends_on:
       - strapi
       - seller
@@ -134,10 +142,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-#    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
 
 
   certbot:
