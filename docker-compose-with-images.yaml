@@ -1,4 +1,4 @@
-version: '2'
+version: '2.4'
 
 services:
 
@@ -66,32 +66,83 @@ services:
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
 
-  strapi:
-    build:
-      context: seller-app
-      dockerfile: strapiDocker
-    environment:
-      DATABASE_CLIENT: postgres
-      DATABASE_NAME: strapi
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
-      DATABASE_SCHEMA: public
-    volumes:
-      - ./app:/srv/app
+  mongo:
+    image: mongo
+    restart: always
+    platform: linux/arm64/v8
     ports:
-      - '1337:1337'
-    depends_on:
-      - postgres
+      - 27017:27017
+    volumes:
+      - './data:/data/db'
 
   seller:
     build:
       context: seller-app
+      dockerfile: sellerDocker
+    restart: "always"
+    environment:
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_AUTH_USERNAME: ${SMTP_AUTH_USERNAME}
+      SMTP_AUTH_PASSWORD: ${SMTP_AUTH_PASSWORD}
+      SMTP_EMAIL_SENDER: ${SMTP_EMAIL_SENDER}
+      SMTP_EXCEPTION_EMAIL_RECIPIENTS: ${SMTP_EXCEPTION_EMAIL_RECIPIENTS}
+      SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
+      MONGODB_DATABASE_HOST: mongodb://mongo
+      MONGODB_DATABASE_PORT: 27017
+      MONGODB_DATABASE_USERNAME: "root"
+      MONGODB_DATABASE_PASSWORD: "root"
+      MONGODB_DATABASE_NAME: "ondc-seller"
+      AUTH_ACCESS_JWT_SECRET: "wftd3hg5$g67h*fd5h6fbvcy6rtg5wftd3hg5$g67h*fd5xxx"
+      BASE_APP_NAMESPACE: "Seller"
+      BASE_APP_PORT: 3019
+      S3_VERSION: "v4"
+      S3_REGION: ${S3_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '3019:3019'
+    depends_on:
+      - mongo
+    expose:
+      - 3019
+
+  notification:
+    build:
+      context: seller-app
+      dockerfile: notificationDocker
+    restart: "always"
+    environment:
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_AUTH_USERNAME: ${SMTP_AUTH_USERNAME}
+      SMTP_AUTH_PASSWORD: ${SMTP_AUTH_PASSWORD}
+      SMTP_EMAIL_SENDER: ${SMTP_EMAIL_SENDER}
+      SMTP_EXCEPTION_EMAIL_RECIPIENTS: ${SMTP_EXCEPTION_EMAIL_RECIPIENTS}
+      SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
+      AUTH_ACCESS_JWT_SECRET: ${AUTH_ACCESS_JWT_SECRET}
+      BASE_APP_NAMESPACE: "notification"
+      BASE_APP_PORT: 3020
+      INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '3020:3020'
+    depends_on:
+      - mongo
+    expose:
+      - 3020
+
+  seller-client:
+    build:
+      context: seller-app
       dockerfile: sellerApiDocker
+    restart: "always"
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
-      STRAPI_SERVER_URL: http://strapi:1337
+      SELLER_SERVER_URL: http://seller:3019
       NODE_ENV: production
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
@@ -107,9 +158,9 @@ services:
     volumes:
       - ./app:/srv/app
     ports:
-      - '3002:3001'
+      - '3001:3001'
     depends_on:
-      - strapi
+      - seller
       - postgres
 
   postgres:
