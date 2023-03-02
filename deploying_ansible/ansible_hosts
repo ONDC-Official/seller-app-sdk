@@ -1,6 +1,9 @@
 [dev]
 35.154.223.253
 
+[pre-prod]
+ondc-seller-app-pre-prod
+
 [defaults]
 [dev:vars]
 ansible_ssh_user=ubuntu
