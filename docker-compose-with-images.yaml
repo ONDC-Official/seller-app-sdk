@@ -126,6 +126,7 @@ services:
       BASE_APP_NAMESPACE: "notification"
       BASE_APP_PORT: 3020
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+      INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
     volumes:
       - ./app:/srv/app
     ports:
@@ -181,6 +182,7 @@ services:
         REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
         REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
         REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
+        REACT_APP_SELLER_BACKEND_URL: ${REACT_APP_SELLER_BACKEND_URL}
     restart: "always"
     environment:
       REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
