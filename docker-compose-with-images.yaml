@@ -69,7 +69,6 @@ services:
   mongo:
     image: mongo
     restart: always
-    platform: linux/arm64/v8
     ports:
       - 27017:27017
     volumes:
@@ -100,6 +99,8 @@ services:
       S3_REGION: ${S3_REGION}
       S3_BUCKET: ${S3_BUCKET}
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     volumes:
       - ./app:/srv/app
     ports:
@@ -189,12 +190,16 @@ services:
       REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
       REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
     depends_on:
-      - strapi
       - seller
       - bpp-protocol-webserver
+      - seller-client
     ports:
       - "80:80"
       - "443:443"
+
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
 
 
   certbot:

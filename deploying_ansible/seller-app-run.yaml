@@ -21,7 +21,7 @@
       git:
         repo: "git@github.com:dataorchestration/seller-app.git"
         dest: "/home/ubuntu/seller-app"
-        version: 'feature/logistics'
+        version: 'feature/whitelabel'
         force: yes
 
     - name: Clone seller-app-protocol
@@ -29,6 +29,13 @@
         repo: "git@github.com:dataorchestration/seller-app-protocol.git"
         dest: "/home/ubuntu/seller-app-protocol"
         version: 'logistics-api-integration'
+        force: yes
+
+    - name: Clone seller-app-frontend
+      git:
+        repo: "git@github.com:dataorchestration/seller-app-frontend.git"
+        dest: "/home/ubuntu/seller-app-frontend"
+        version: 'master'
         force: yes
 
     - name: Copy docker-compose file with domain replaced
@@ -41,23 +48,23 @@
 
     - name: copy Dockerfile with ssl as dockerfile in bpp-nginx
       copy:
-        src: "{{ playbook_dir }}/../bpp-nginx/Dockerfile"
-        dest: "/home/ubuntu/bpp-nginx/Dockerfile"
+        src: "{{ playbook_dir }}/../seller-app-frontend/Dockerfile"
+        dest: "/home/ubuntu/seller-app-frontend/Dockerfile"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
 
     - name: copy nginx conf with ssl
       copy:
-        src: "{{ playbook_dir }}/../bpp-nginx/nginx-replace-with-domain.conf"
-        dest: "/home/ubuntu/bpp-nginx/nginx.conf"
+        src: "{{ playbook_dir }}/../seller-app-frontend/nginx-replace-with-domain.conf"
+        dest: "/home/ubuntu/seller-app-frontend/nginx.conf"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
 
     - name: replace __domain__ with domain name
       replace:
-        path: "/home/ubuntu/bpp-nginx/nginx.conf"
+        path: "/home/ubuntu/seller-app-frontend/nginx.conf"
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
