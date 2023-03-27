@@ -1,9 +1,9 @@
 [submodule "seller-app"]
 	path = seller-app
-	url = git@github.com:dataorchestration/seller-app.git
+	url = git@github.com:ONDC-Official/seller-app.git
 [submodule "seller-app-protocol"]
 	path = seller-app-protocol
-	url = git@github.com:dataorchestration/seller-app-protocol.git
+	url = git@github.com:ONDC-Official/seller-app-protocol.git
 [submodule "seller-app-frontend"]
 	path = seller-app-frontend
-	url = git@github.com:dataorchestration/seller-app-frontend.git
+	url = git@github.com:ONDC-Official/seller-app-frontend.git
