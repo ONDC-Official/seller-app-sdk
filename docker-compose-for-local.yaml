@@ -101,6 +101,8 @@ services:
       S3_REGION: ${S3_REGION}
       S3_BUCKET: ${S3_BUCKET}
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     volumes:
       - ./app:/srv/app
     ports:
@@ -126,6 +128,8 @@ services:
       BASE_APP_NAMESPACE: "notification"
       BASE_APP_PORT: 3020
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+      INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
+      APP_URL: ${APP_URL}
     volumes:
       - ./app:/srv/app
     ports:
@@ -170,7 +174,7 @@ services:
       POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
     volumes:
       - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
-      - ./data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
 
   nginx:
     build:
@@ -180,16 +184,18 @@ services:
         REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
         REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
         REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
+        REACT_APP_SELLER_BACKEND_URL: ${REACT_APP_SELLER_BACKEND_URL}
     restart: "always"
     environment:
       REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
       REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
       REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
+      REACT_APP_BUYER_BACKEND_URL: ${REACT_APP_BUYER_BACKEND_URL}
+      REACT_APP_SELLER_BACKEND_URL: ${REACT_APP_SELLER_BACKEND_URL}
     depends_on:
-      - notification
       - seller
-      - seller-client
       - bpp-protocol-webserver
+      - seller-client
     ports:
       - "80:80"
       - "443:443"
