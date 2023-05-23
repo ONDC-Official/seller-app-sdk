@@ -4,6 +4,10 @@
 [pre-prod]
 ondc-seller-app-pre-prod
 
+[stage]
+ondc-seller-app-stage
+
+
 [defaults]
 [dev:vars]
 ansible_ssh_user=ubuntu

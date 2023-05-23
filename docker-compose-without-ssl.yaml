@@ -9,6 +9,7 @@ services:
     container_name: bpp-protocol-webserver
     depends_on:
       - rabbitmq
+      - postgres
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
@@ -16,6 +17,12 @@ services:
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      FLASK_SERVER: "True"
     expose:
       - 5555
     ports:
@@ -29,6 +36,7 @@ services:
     container_name: bpp-protocol-consumer
     depends_on:
       - rabbitmq
+      - postgres
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
@@ -37,6 +45,13 @@ services:
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
       BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
+      FLASK_SERVER: "False"
 
 
   rabbitmq:
@@ -46,49 +61,107 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-    volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
 
-  strapi:
-    build:
-      context: seller-app
-      dockerfile: strapiDocker
-    environment:
-      DATABASE_CLIENT: postgres
-      DATABASE_NAME: strapi
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
-      DATABASE_SCHEMA: public
-    volumes:
-      - ./app:/srv/app
+  mongo:
+    image: mongo
+    restart: always
     ports:
-      - '1337:1337'
-    depends_on:
-      - postgres
+      - 27017:27017
+    volumes:
+      - './data:/data/db'
 
   seller:
     build:
       context: seller-app
+      dockerfile: sellerDocker
+    restart: "always"
+    environment:
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_AUTH_USERNAME: ${SMTP_AUTH_USERNAME}
+      SMTP_AUTH_PASSWORD: ${SMTP_AUTH_PASSWORD}
+      SMTP_EMAIL_SENDER: ${SMTP_EMAIL_SENDER}
+      SMTP_EXCEPTION_EMAIL_RECIPIENTS: ${SMTP_EXCEPTION_EMAIL_RECIPIENTS}
+      SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
+      MONGODB_DATABASE_HOST: mongodb://mongo
+      MONGODB_DATABASE_PORT: 27017
+      MONGODB_DATABASE_USERNAME: "root"
+      MONGODB_DATABASE_PASSWORD: "root"
+      MONGODB_DATABASE_NAME: "ondc-seller"
+      AUTH_ACCESS_JWT_SECRET: "wftd3hg5$g67h*fd5h6fbvcy6rtg5wftd3hg5$g67h*fd5xxx"
+      BASE_APP_NAMESPACE: "Seller"
+      BASE_APP_PORT: 3019
+      S3_VERSION: "v4"
+      S3_REGION: ${S3_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '3019:3019'
+    depends_on:
+      - mongo
+    expose:
+      - 3019
+
+  notification:
+    build:
+      context: seller-app
+      dockerfile: notificationDocker
+    restart: "always"
+    environment:
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_AUTH_USERNAME: ${SMTP_AUTH_USERNAME}
+      SMTP_AUTH_PASSWORD: ${SMTP_AUTH_PASSWORD}
+      SMTP_EMAIL_SENDER: ${SMTP_EMAIL_SENDER}
+      SMTP_EXCEPTION_EMAIL_RECIPIENTS: ${SMTP_EXCEPTION_EMAIL_RECIPIENTS}
+      SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
+      AUTH_ACCESS_JWT_SECRET: ${AUTH_ACCESS_JWT_SECRET}
+      BASE_APP_NAMESPACE: "notification"
+      BASE_APP_PORT: 3020
+      INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
+      INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
+      APP_URL: ${APP_URL}
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '3020:3020'
+    depends_on:
+      - mongo
+    expose:
+      - 3020
+
+  seller-client:
+    build:
+      context: seller-app
       dockerfile: sellerApiDocker
+    restart: "always"
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
-      STRAPI_SERVER_URL: http://strapi:1337
+      SELLER_SERVER_URL: http://seller:3019
       NODE_ENV: production
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME_SELLER_CLIENT: ${CLIENT_PG_DATABASE}
+      DATABASE_USERNAME: ${CLIENT_PG_USER}
+      DATABASE_PASSWORD: ${CLIENT_PG_PASSWORD}
     volumes:
       - ./app:/srv/app
     ports:
       - '3001:3001'
     depends_on:
-      - strapi
+      - seller
+      - postgres
 
   postgres:
     image: postgres
@@ -97,7 +170,8 @@ services:
       POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
+      - ./data/postgres:/var/lib/postgresql/data
 
   nginx:
     build:
@@ -107,18 +181,24 @@ services:
         REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
         REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
         REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
+        REACT_APP_SELLER_BACKEND_URL: ${REACT_APP_SELLER_BACKEND_URL}
     restart: "always"
     environment:
       REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
       REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
       REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
+      REACT_APP_BUYER_BACKEND_URL: ${REACT_APP_BUYER_BACKEND_URL}
+      REACT_APP_SELLER_BACKEND_URL: ${REACT_APP_SELLER_BACKEND_URL}
     depends_on:
-      - strapi
       - seller
       - bpp-protocol-webserver
+      - seller-client
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
 
   certbot:
     image: certbot/certbot

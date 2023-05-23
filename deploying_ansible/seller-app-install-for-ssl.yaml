@@ -9,7 +9,7 @@
       private: no
 
     - name: domain
-      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org )
+      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org )
       private: no
 
     - name: envtype
@@ -18,9 +18,9 @@
 
 
   tasks:
-    - name: Clone seller-app(client, strapi)
+    - name: Clone seller-app(client)
       git:
-        repo: "git@github.com:dataorchestration/seller-app.git"
+        repo: "git@github.com:ondc-official/seller-app.git"
         dest: "/home/ubuntu/seller-app"
         version: 'master'
         force: yes
@@ -28,8 +28,15 @@
 
     - name: Clone seller-app-protocol
       git:
-        repo: "git@github.com:dataorchestration/seller-app-protocol.git"
+        repo: "git@github.com:ondc-official/seller-app-protocol.git"
         dest: "/home/ubuntu/seller-app-protocol"
+        version: 'logistics-api-integration'
+        force: yes
+
+    - name: Clone seller-app-frontend
+      git:
+        repo: "git@github.com:ondc-official/seller-app-frontend.git"
+        dest: "/home/ubuntu/seller-app-frontend"
         version: 'master'
         force: yes
 
@@ -48,25 +55,18 @@
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
-    - name: Copy bpp-nginx folder
-      copy:
-        src: "{{ playbook_dir }}/../bpp-nginx"
-        dest: "/home/ubuntu/"
-        owner: "ubuntu"
-        group: "ubuntu"
-        mode: "0755"
 
-    - name: copy Dockerfile without SSL as dockerfile in bpp-nginx
+    - name: copy Dockerfile without SSL as dockerfile in seller-app-frontend
       copy:
-        src: "{{ playbook_dir }}/../bpp-nginx/DockerfileWithoutSSL"
-        dest: "/home/ubuntu/bpp-nginx/Dockerfile"
+        src: "{{ playbook_dir }}/../seller-app-frontend/DockerfileWithoutSSL"
+        dest: "/home/ubuntu/seller-app-frontend/Dockerfile"
         owner: "ubuntu"
         group: "ubuntu"
         mode: "0755"
 
     - name: replace __domain__ with in nginx.conf
       replace:
-        path: "/home/ubuntu/bpp-nginx/nginx-without-ssl.conf"
+        path: "/home/ubuntu/seller-app-frontend/nginx-without-ssl.conf"
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
@@ -113,6 +113,7 @@
         owner: ubuntu
         group: ubuntu
         mode: 0755
+
 
     - name: Run docker compose up
       shell: "cd /home/ubuntu/ && sudo docker-compose build && sudo docker-compose up -d"
