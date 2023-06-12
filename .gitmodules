@@ -9,4 +9,7 @@
     url = https://github.com/ONDC-Official/seller-app-frontend.git
 [submodule "seller-app-igm"]
     path = seller-app-igm
-    url = https://github.com/robin-chauhan1/seller-app-igm.git
+    url = https://github.com/ONDC-Official/seller-app-igm.git
+[submodule "seller-bugzilla-service"]
+    path = seller-app-igm
+    url = https://github.com/ONDC-Official/seller-bugzilla-service.git
