@@ -23,11 +23,11 @@ services:
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
       FLASK_SERVER: "True"
+      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
     expose:
       - 5555
     ports:
       - 5555:5555
-
 
   bpp-protocol-consumer:
     build:
@@ -52,7 +52,7 @@ services:
       PG_PASSWORD: ${PG_PASSWORD}
       FLASK_SERVER: "False"
       BG_DEFAULT_URL: ${BG_DEFAULT_URL}
-
+      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
 
   rabbitmq:
     image: rabbitmq:3.10-management
@@ -64,7 +64,6 @@ services:
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-
 
   mongo:
     image: mongo
@@ -101,6 +100,10 @@ services:
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
+      MMI_CLIENT_SECRET: ${MMI_CLIENT_SECRET}
+      MMI_CLIENT_ID: ${MMI_CLIENT_ID}
+      MMI_ADVANCE_API_KEY: ${MMI_ADVANCE_API_KEY}
     volumes:
       - ./app:/srv/app
     ports:
@@ -204,6 +207,46 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
 
+  seller-app-igm:
+    build:
+      context: seller-app-igm
+    environment:
+      PROTOCOL_BASE_URL: ${PROTOCOL_BASE_URL}
+      DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
+      BUGZILLA_SERVICE_URI: ${BUGZILLA_SERVICE_URI}
+      BPP_URI: ${BPP_URI}
+      DOMAIN: ${DOMAIN}
+      BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+    ports:
+      - "8000:8000"
+    restart: always
+
+  bugzilla-node-backend:
+    container_name: bugzilla-node-dev-seller
+    build:
+      context: seller-bugzilla-service
+      dockerfile: Dockerfile
+    environment:
+      ENV: prod
+      BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+      BUGZILLA_BASE_URI: ${BUGZILLA_BASE_URI}
+      BUGZILLA_ADMIN_EMAIL: ${BUGZILLA_ADMIN_EMAIL}
+    ports:
+      - "8001:8001"
+    restart: always
+
+  bugzilla-dev-service:
+    build:
+      context: ./seller-bugzilla-service/bugzilla-main
+      dockerfile: Dockerfile
+    environment:
+      BUGZILLA_WWW: /var/www/html/bugzilla/
+      BUGZILLA_ADMIN_EMAIL: ${BUGZILLA_ADMIN_EMAIL}
+    container_name: bugzilla-dev-service-seller
+    image: shameerkc/bugzilla-dev-sqlite
+    ports:
+      - "90:80"
+      - "5989:5900"
 
   certbot:
     image: certbot/certbot
