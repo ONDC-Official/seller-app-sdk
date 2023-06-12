@@ -1,6 +1,6 @@
 ---
 - name: Update web servers
-  hosts: '{{ target }}'
+  hosts: "{{ target }}"
   remote_user: ubuntu
 
   vars_prompt:
@@ -16,30 +16,41 @@
       prompt: please enter the env file to copy, we are appending to .env, hence value can be -staging etc
       private: no
 
-
   tasks:
-    - name: Clone seller-app(client)
+    - name: Clone seller-app
       git:
-        repo: "git@github.com:ondc-official/seller-app.git"
+        repo: "https://github.com/ONDC-Official/seller-app.git"
         dest: "/home/ubuntu/seller-app"
-        version: 'master'
+        version: "master"
         force: yes
-
 
     - name: Clone seller-app-protocol
       git:
-        repo: "git@github.com:ondc-official/seller-app-protocol.git"
+        repo: "https://github.com/ONDC-Official/seller-app-protocol.git"
         dest: "/home/ubuntu/seller-app-protocol"
-        version: 'logistics-api-integration'
+        version: "master"
         force: yes
 
     - name: Clone seller-app-frontend
       git:
-        repo: "git@github.com:ondc-official/seller-app-frontend.git"
+        repo: "https://github.com/ONDC-Official/seller-app-frontend.git"
         dest: "/home/ubuntu/seller-app-frontend"
-        version: 'master'
+        version: "master"
         force: yes
 
+    - name: Clone seller-app-igm
+      git:
+        repo: "https://github.com/ONDC-Official/seller-app-igm.git"
+        dest: "/home/ubuntu/seller-app-igm"
+        version: "master"
+        force: yes
+
+    - name: Clone seller-bugzilla-service
+      git:
+        repo: "https://github.com/ONDC-Official/seller-bugzilla-service.git"
+        dest: "/home/ubuntu/seller-bugzilla-service"
+        version: "master"
+        force: yes
 
     - name: Copy lets encrypt with domain replaced
       copy:
@@ -70,7 +81,6 @@
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
-
     - name: copy env file with domain replaced
       copy:
         src: "{{ playbook_dir }}/../.env{{ envtype }}"
@@ -93,7 +103,6 @@
         group: "ubuntu"
         mode: "0755"
 
-
     #sudo chmod -R a+w ~/.docker-conf/rabbitmq/log
     - name: give permissions for rabbitmq data
       become: yes
@@ -103,7 +112,6 @@
         owner: ubuntu
         group: ubuntu
         mode: 0755
-
 
     - name: give permissions for rabbitmq log
       become: yes
