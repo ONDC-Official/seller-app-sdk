@@ -180,6 +180,8 @@ services:
     volumes:
       - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   nginx:
     build:
@@ -212,9 +214,17 @@ services:
       PROTOCOL_BASE_URL: ${PROTOCOL_BASE_URL}
       DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
       BUGZILLA_SERVICE_URI: ${BUGZILLA_SERVICE_URI}
-      BPP_URI: ${BPP_URI}
       DOMAIN: ${DOMAIN}
       BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_HOST: ${PG_HOST}
+      BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      LOGISTICS_BAP_ID: ${LOGISTICS_BAP_ID}
+      LOGISTICS_BAP_URI: ${LOGISTICS_BAP_URI}
+      SELLER_SERVER_URL: http://seller:3019
     ports:
       - "8000:8000"
     restart: always
