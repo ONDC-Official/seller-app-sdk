@@ -222,8 +222,6 @@ services:
       PG_HOST: ${PG_HOST}
       BPP_ID: ${BPP_ID}
       BPP_URI: ${BPP_URI}
-      LOGISTICS_BAP_ID: ${LOGISTICS_BAP_ID}
-      LOGISTICS_BAP_URI: ${LOGISTICS_BAP_URI}
       SELLER_SERVER_URL: http://seller:3019
     ports:
       - "8000:8000"
