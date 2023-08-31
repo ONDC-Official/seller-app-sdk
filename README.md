@@ -9,6 +9,8 @@ This repo is ONDC Seller App with micro-service architecture which contains
 - [Seller-app](https://github.com/ONDC-Official/seller-app.git) - Node.js
 - [Seller-app-frontend](https://github.com/ONDC-Official/seller-app-frontend.git) - Frontend application (react) being served via [nginx](https://www.nginx.com).
 - [Seller-app-protocol](https://github.com/ONDC-Official/seller-app-protocol.git) - Protocol layer(python).
+- [Seller-app-igm](https://github.com/ONDC-Official/seller-app-igm.git) - IGM layer(node).
+- [Seller-bugzilla-service](https://github.com/ONDC-Official/seller-bugzilla-service.git) - Bugzilla layer(node).
 
 ## For whom
 
