@@ -9,12 +9,13 @@
       private: no
 
     - name: domain
-      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org )
+      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org, ref-app-seller-dev-internal.ondc.org )
       private: no
 
     - name: envtype
       prompt: please enter the env file to copy, we are appending to .env, hence value can be -staging etc
       private: no
+
 
   tasks:
     - name: Clone seller-app

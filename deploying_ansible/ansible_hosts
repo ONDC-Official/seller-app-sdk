@@ -7,6 +7,8 @@ ondc-seller-app-pre-prod
 [stage]
 ondc-seller-app-stage
 
+[dev-internal]
+ondc-ref-app-seller-dev-internal
 
 [defaults]
 [dev:vars]
