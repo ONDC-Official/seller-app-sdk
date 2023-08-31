@@ -13,6 +13,7 @@ services:
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
+      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
@@ -28,7 +29,6 @@ services:
       - 5555
     ports:
       - 5555:5555
-
 
   bpp-protocol-consumer:
     build:
@@ -47,6 +47,7 @@ services:
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
       BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
+      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
       PG_HOST: ${PG_HOST}
       PG_PORT: ${PG_PORT}
       PG_DATABASE: ${PG_DATABASE}
@@ -54,7 +55,6 @@ services:
       PG_PASSWORD: ${PG_PASSWORD}
       BG_DEFAULT_URL: ${BG_DEFAULT_URL}
       FLASK_SERVER: "False"
-
 
   rabbitmq:
     image: rabbitmq:3.10-management
@@ -66,7 +66,6 @@ services:
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-
 
   mongo:
     image: mongo
@@ -103,6 +102,10 @@ services:
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
+      MMI_CLIENT_SECRET: ${MMI_CLIENT_SECRET}
+      MMI_CLIENT_ID: ${MMI_CLIENT_ID}
+      MMI_ADVANCE_API_KEY: ${MMI_ADVANCE_API_KEY}
     volumes:
       - ./app:/srv/app
     ports:
@@ -124,9 +127,9 @@ services:
       SMTP_EMAIL_SENDER: ${SMTP_EMAIL_SENDER}
       SMTP_EXCEPTION_EMAIL_RECIPIENTS: ${SMTP_EXCEPTION_EMAIL_RECIPIENTS}
       SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
-      AUTH_ACCESS_JWT_SECRET: ${AUTH_ACCESS_JWT_SECRET}
       BASE_APP_NAMESPACE: "notification"
       BASE_APP_PORT: 3020
+      AUTH_ACCESS_JWT_SECRET: ${AUTH_ACCESS_JWT_SECRET}
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
       INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
       APP_URL: ${APP_URL}
@@ -158,6 +161,8 @@ services:
       DATABASE_NAME_SELLER_CLIENT: ${CLIENT_PG_DATABASE}
       DATABASE_USERNAME: ${CLIENT_PG_USER}
       DATABASE_PASSWORD: ${CLIENT_PG_PASSWORD}
+      LOGISTICS_DELIVERY_TYPE: ${LOGISTICS_DELIVERY_TYPE}
+      LOGISTICS_BAP_ID: ${LOGISTICS_BAP_ID}
     volumes:
       - ./app:/srv/app
     ports:
@@ -175,6 +180,8 @@ services:
     volumes:
       - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   nginx:
     build:
@@ -199,3 +206,50 @@ services:
     ports:
       - "80:80"
       - "443:443"
+
+  seller-app-igm:
+    build:
+      context: seller-app-igm
+    environment:
+      PROTOCOL_BASE_URL: ${PROTOCOL_BASE_URL}
+      DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
+      BUGZILLA_SERVICE_URI: ${BUGZILLA_SERVICE_URI}
+      DOMAIN: ${DOMAIN}
+      BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_HOST: ${PG_HOST}
+      BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      SELLER_SERVER_URL: http://seller:3019
+    ports:
+      - "8000:8000"
+    restart: always
+
+  bugzilla-node-backend:
+    container_name: bugzilla-node-dev-seller
+    build:
+      context: seller-bugzilla-service
+      dockerfile: Dockerfile
+    environment:
+      ENV: prod
+      BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+      BUGZILLA_BASE_URI: ${BUGZILLA_BASE_URI}
+      BUGZILLA_ADMIN_EMAIL: ${BUGZILLA_ADMIN_EMAIL}
+    ports:
+      - "8001:8001"
+    restart: always
+
+  bugzilla-dev-service:
+    build:
+      context: ./seller-bugzilla-service/bugzilla-main
+      dockerfile: Dockerfile
+    environment:
+      BUGZILLA_WWW: /var/www/html/bugzilla/
+      BUGZILLA_ADMIN_EMAIL: ${BUGZILLA_ADMIN_EMAIL}
+    container_name: bugzilla-dev-service-seller
+    image: shameerkc/bugzilla-dev-sqlite
+    ports:
+      - "90:80"
+      - "5989:5900"
