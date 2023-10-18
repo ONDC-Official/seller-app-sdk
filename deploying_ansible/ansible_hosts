@@ -10,6 +10,14 @@ ondc-seller-app-stage
 [dev-internal]
 ondc-ref-app-seller-dev-internal
 
+[preprod-2]
+ec2-ondc-ref-buyer-app-preprod-2
+
+
+[pre-prod-v2]
+ondc-seller-app-pre-prod-v2
+
+
 [defaults]
 [dev:vars]
 ansible_ssh_user=ubuntu

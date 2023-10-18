@@ -9,7 +9,7 @@
       private: no
 
     - name: domain
-      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org, ref-app-seller-dev-internal.ondc.org )
+      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org, ref-app-seller-dev-internal.ondc.org, seller-app-preprod-v2.ondc.org )
       private: no
 
     - name: envtype
