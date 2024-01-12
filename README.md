@@ -1,3 +1,79 @@
+# Reference Seller Web Application Feature List V1.2
+
+| Feature                     | Sub Feature                                                                | Status                                            |
+|-----------------------------|----------------------------------------------------------------------------|---------------------------------------------------|
+| Incremental catalog refresh | Provider disabling                                                         | $${\color{green}Available}$$                      |
+|                             | Store disabling                                                            | $${\color{green}Available}$$                      |
+|                             | Store closed (known duration)                                              | $${\color{green}Available}$$                      |
+|                             | Store closed (unknown duration)                                            | $${\color{green}Available}$$                      |
+|                             | Item record changes                                                        | $${\color{green}Available}$$                      |
+|                             | Offers                                                                     | $${\color{orange}In \space future \space scope}$$ |
+| Full catalog refresh        | RET codes for L1 categories                                                | $${\color{green}Available}$$                      |
+|                             | Catalog directly to BNP                                                    | $${\color{green}Available}$$                      |
+|                             | Updated taxonomy (BPC, H&K, H&W)                                           | $${\color{green}Available}$$                      |
+|                             | Store open / close / disable / enable                                      | $${\color{green}Available}$$                      |
+|                             | Customization (input - selection)                                          | $${\color{green}Available}$$                      |
+|                             | Customization (input - free text)                                          | $${\color{orange}In \space future \space scope}$$ |
+|                             | Handling of make-to-order items display price having base price of 0       | $${\color{green}Available}$$                      |
+|                             | Variants                                                                   | $${\color{green}Available}$$                      |
+|                             | Custom Menu                                                                | $${\color{green}Available}$$                      |
+|                             | Definition of ISN/MSN                                                      | $${\color{blue}Under \space Development}$$        |
+|                             | Item availability schedule                                                 | $${\color{green}Available}$$                      |
+| Order tracking              | Hyperlocal - using gps coordinates                                         | $${\color{green}Available}$$                      |
+|                             | Hyperlocal & inter-city - using URL                                        | $${\color{orange}In \space future \space scope}$$ |
+|                             | Live Order Tracking                                                        | $${\color{green}Available}$$                      |
+| Order flow                  | Addition of quote type                                                     | $${\color{blue}Under \space Development}$$        |
+|                             | Updated /confirm, /on_confirm flow                                         | $${\color{blue}Under \space Development}$$        |
+|                             | Customization (input - selection: all pre-order APIs)                      | $${\color{green}Available}$$                      |
+|                             | Customization (input - free text: all pre-order APIs)                      | $${\color{orange}In \space future \space scope}$$ |
+|                             | Customization (input - selection: all post-order APIs)                     | $${\color{green}Available}$$                      |
+|                             | Customization (input - free text: all post-order APIs)                     | $${\color{orange}In \space future \space scope}$$ |
+|                             | Payment collection by SNP                                                  | $${\color{orange}In \space future \space scope}$$ |
+|                             | Exchange of GST no between BNP & SNP                                       | $${\color{orange}In \space future \space scope}$$ |
+|                             | PAN no for provider for verification of ISN / MSN                          | $${\color{orange}In \space future \space scope}$$ |
+| Offers                      | Offer definition in catalog                                                | $${\color{orange}In \space future \space scope}$$ |
+|                             | Applying offers during checkout                                            | $${\color{orange}In \space future \space scope}$$ |
+|                             | Offer support in other pre-order APIs                                      | $${\color{orange}In \space future \space scope}$$ |
+|                             | Offer support in other post-order APIs                                     | $${\color{orange}In \space future \space scope}$$ |
+| Cancellation                | Updated cancel API (non-RTO)                                               | $${\color{green}Available}$$                      |
+|                             | RTO flow for cancellation                                                  | $${\color{green}Available}$$                      |
+|                             | Definition & communication of cancellation terms (fees, etc)               | $${\color{orange}In \space future \space scope}$$ |
+|                             | Force cancellation (for fulfillment TAT breach)                            | $${\color{orange}In \space future \space scope}$$ |
+|                             | Linking cancellation with IGM issue                                        | $${\color{orange}In \space future \space scope}$$ |
+| Static terms                | Enabling static terms                                                      | $${\color{orange}In \space future \space scope}$$ |
+| BNP + logistics             | Enabling logistics integration with BNP                                    | $${\color{orange}In \space future \space scope}$$ |
+| Update API                  | Merchant part cancel                                                       | $${\color{green}Available}$$                      |
+|                             | Return with pickup                                                         | $${\color{blue}Under \space Development}$$        |
+|                             | Return with liquidation                                                    | $${\color{green}Available}$$                      |
+|                             | Cancel return request                                                      | $${\color{green}Available}$$                      |
+|                             | Linking return with IGM issue                                              | $${\color{orange}In \space future \space scope}$$ |
+| Fulfillment                 | Enabling self-pickup                                                       | $${\color{blue}Under \space Development}$$        |
+|                             | Enabling slotted delivery                                                  | $${\color{blue}Under \space Development}$$        |
+|                             | Enabling additional fulfillment states - hyperlocal                        | $${\color{green}Available}$$                      |
+|                             | Enabling additional fulfillment states - inter-city                        | $${\color{green}Available}$$                      |
+|                             | Enabling authorization options                                             | $${\color{orange}In \space future \space scope}$$ |
+|                             | Cascading discount, taxes on fulfillment from LSP                          | $${\color{orange}In \space future \space scope}$$ |
+|                             | Payment on Delivery                                                        | $${\color{orange}In \space future \space scope}$$ |
+|                             | Notification from LSP on fulfillment delay                                 | $${\color{orange}In \space future \space scope}$$ |
+| Catalog (others)            | Polygon serviceability                                                     | $${\color{blue}Under \space Development}$$        |
+|                             | Pincode serviceability                                                     | $${\color{orange}In \space future \space scope}$$ |
+|                             | QR code deep link (Enablement and Generation)                              | $${\color{orange}In \space future \space scope}$$ |
+|                             | Distributed search by city                                                 | $${\color{orange}In \space future \space scope}$$ |
+|                             | Back image for items                                                       | $${\color{orange}In \space future \space scope}$$ |
+|                             | SNP communicating acceptable finder fee                                    | $${\color{orange}In \space future \space scope}$$ |
+|                             | Min order value                                                            | $${\color{orange}In \space future \space scope}$$ |
+|                             | Different store timings for delivery, pickup, order processing             | $${\color{orange}In \space future \space scope}$$ |
+|                             | Provider credentials                                                       | $${\color{orange}In \space future \space scope}$$ |
+|                             | Catalog download zip file link                                             | $${\color{orange}In \space future \space scope}$$ |
+|                             | Communication from buyer NP to seller NP (catalog ingestion feedback, etc) | $${\color{orange}In \space future \space scope}$$ |
+| Rating                      | rating, on_rating                                                          | $${\color{orange}In \space future \space scope}$$ |
+| Others                      | /info, /on_info APIs                                                       | $${\color{orange}In \space future \space scope}$$ |
+|                             | Off Network Logistics Option                                               | $${\color{orange}In \space future \space scope}$$ |
+|                             | Option to select logistics delivery type                                   | $${\color{green}Available}$$                      |
+|                             | Bhashini Integration                                                       | $${\color{orange}In \space future \space scope}$$ |
+| Catalog Indexing            |                                                                            | $${\color{orange}In \space future \space scope}$$ |
+| Category Seller Panel       |                                                                            | $${\color{orange}In \space future \space scope}$$ |
+
 # User Manual
 
 A detailed user manual for the seller reference app is available [here](https://docs.google.com/document/d/1-8OIo8Ka6Z4ey1amxG_a69lLM0B6tozsWmzwrQmgHKQ/edit).
