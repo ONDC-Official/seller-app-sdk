@@ -1,4 +1,11 @@
-# Reference Seller Web Application Feature List V1.2
+## User Manual
+
+A detailed user manual for the seller reference app is available [here](https://docs.google.com/document/d/1-8OIo8Ka6Z4ey1amxG_a69lLM0B6tozsWmzwrQmgHKQ/edit).
+
+## ONDC - API Contract for Retail (v1.2.0)
+[Documentation](https://docs.google.com/document/d/1brvcltG_DagZ3kGr1ZZQk4hG4tze3zvcxmGV4NMTzr8/edit)
+
+## Reference Seller Web Application Feature List V1.2
 
 | Feature                     | Sub Feature                                                                | Status                                            |
 |-----------------------------|----------------------------------------------------------------------------|---------------------------------------------------|
@@ -73,10 +80,6 @@
 |                             | Bhashini Integration                                                       | $${\color{orange}In \space future \space scope}$$ |
 | Catalog Indexing            |                                                                            | $${\color{orange}In \space future \space scope}$$ |
 | Category Seller Panel       |                                                                            | $${\color{orange}In \space future \space scope}$$ |
-
-# User Manual
-
-A detailed user manual for the seller reference app is available [here](https://docs.google.com/document/d/1-8OIo8Ka6Z4ey1amxG_a69lLM0B6tozsWmzwrQmgHKQ/edit).
 
 ## Introduction
 
