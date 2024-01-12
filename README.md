@@ -1,3 +1,8 @@
+## ONDC SDK SELLER APP
+
+A seller app refers to an application that will allow providers (seller on record or actual seller) to interact with the buyers/ end consumers through the buyer application.
+Seller app manages the actual fulfillment of orders.
+
 ## User Manual
 
 A detailed user manual for the seller reference app is available [here](https://docs.google.com/document/d/1-8OIo8Ka6Z4ey1amxG_a69lLM0B6tozsWmzwrQmgHKQ/edit).
