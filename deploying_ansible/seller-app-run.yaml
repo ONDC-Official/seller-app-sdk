@@ -1,15 +1,18 @@
 ---
 - name: Update web servers
   hosts: "{{ target }}"
-  remote_user: ubuntu
+  remote_user: "{{ remote_user }}"
 
   vars_prompt:
+    - name: remote_user
+      prompt: enter the remote host, mostly it will be ubuntu or root
+      private: no
     - name: target
       prompt: enter the hostname which you might have mentioned in host file
       private: no
 
     - name: domain
-      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org, ref-app-seller-dev-internal.ondc.org )
+      prompt: please enter the domain which will be serving the requests(eg sellerapp-staging.datasyndicate.in or ref-seller-app-preprod.ondc.org or ref-seller-app-stage.ondc.org, ref-app-seller-dev-internal.ondc.org, seller-app-preprod-v2.ondc.org )
       private: no
 
     - name: envtype
@@ -53,28 +56,28 @@
         version: "master"
         force: yes
 
-    - name: Copy docker-compose file with domain replaced
+    - name: Copy docker compose file with domain replaced
       copy:
         src: "{{ playbook_dir }}/../docker-compose-with-images.yaml"
         dest: "/home/ubuntu/docker-compose.yml"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: copy Dockerfile with ssl as dockerfile in seller-app-frontend
       copy:
         src: "{{ playbook_dir }}/../seller-app-frontend/Dockerfile"
         dest: "/home/ubuntu/seller-app-frontend/Dockerfile"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: copy nginx conf with ssl
       copy:
         src: "{{ playbook_dir }}/../seller-app-frontend/nginx-replace-with-domain.conf"
         dest: "/home/ubuntu/seller-app-frontend/nginx.conf"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: replace __domain__ with domain name
@@ -84,4 +87,4 @@
         replace: "{{ domain }}"
 
     - name: Run docker compose up
-      shell: "cd /home/ubuntu/ && sudo docker-compose build && sudo docker-compose up -d"
+      shell: "cd /home/ubuntu/ && sudo docker compose build && sudo docker compose up -d"

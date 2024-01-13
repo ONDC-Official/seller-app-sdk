@@ -63,14 +63,11 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-    volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
 
   mongo:
     image: mongo
     restart: always
-    platform: linux/arm64/v8
     ports:
       - 27017:27017
     volumes:
@@ -80,6 +77,7 @@ services:
     build:
       context: seller-app
       dockerfile: sellerDocker
+    restart: "always"
     environment:
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -119,6 +117,7 @@ services:
     build:
       context: seller-app
       dockerfile: notificationDocker
+    restart: "always"
     environment:
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -146,6 +145,7 @@ services:
     build:
       context: seller-app
       dockerfile: sellerApiDocker
+    restart: "always"
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
       SELLER_SERVER_URL: http://seller:3019
@@ -180,8 +180,6 @@ services:
     volumes:
       - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data/postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   nginx:
     build:
@@ -253,3 +251,4 @@ services:
     ports:
       - "90:80"
       - "5989:5900"
+
