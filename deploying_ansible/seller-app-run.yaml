@@ -56,28 +56,28 @@
         version: "master"
         force: yes
 
-    - name: Copy docker-compose file with domain replaced
+    - name: Copy docker compose file with domain replaced
       copy:
         src: "{{ playbook_dir }}/../docker-compose-with-images.yaml"
         dest: "/home/ubuntu/docker-compose.yml"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: copy Dockerfile with ssl as dockerfile in seller-app-frontend
       copy:
         src: "{{ playbook_dir }}/../seller-app-frontend/Dockerfile"
         dest: "/home/ubuntu/seller-app-frontend/Dockerfile"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: copy nginx conf with ssl
       copy:
         src: "{{ playbook_dir }}/../seller-app-frontend/nginx-replace-with-domain.conf"
         dest: "/home/ubuntu/seller-app-frontend/nginx.conf"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: replace __domain__ with domain name
@@ -87,4 +87,4 @@
         replace: "{{ domain }}"
 
     - name: Run docker compose up
-      shell: "cd /home/ubuntu/ && sudo docker-compose build && sudo docker-compose up -d"
+      shell: "cd /home/ubuntu/ && sudo docker compose build && sudo docker compose up -d"
