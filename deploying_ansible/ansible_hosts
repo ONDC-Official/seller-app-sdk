@@ -17,6 +17,9 @@ ec2-ondc-ref-buyer-app-preprod-2
 [pre-prod-v2]
 ondc-seller-app-pre-prod-v2
 
+[do-ondc-staging-seller-app]
+do-ondc-staging-seller-app
+
 
 [defaults]
 [dev:vars]

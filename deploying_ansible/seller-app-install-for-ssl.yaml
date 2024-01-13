@@ -1,9 +1,13 @@
 ---
 - name: Update web servers
   hosts: "{{ target }}"
-  remote_user: ubuntu
+  remote_user: "{{ remote_user }}"
 
   vars_prompt:
+    - name: remote_user
+      prompt: enter the remote host, mostly it will be ubuntu or root
+      private: no
+
     - name: target
       prompt: enter the hostname which you might have mentioned in host file
       private: no
@@ -56,8 +60,8 @@
       copy:
         src: "{{ playbook_dir }}/../init-letsencrypt.sh"
         dest: "/home/ubuntu/init-letsencrypt.sh"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: replace __domain__ with domain name
@@ -71,8 +75,8 @@
       copy:
         src: "{{ playbook_dir }}/../seller-app-frontend/DockerfileWithoutSSL"
         dest: "/home/ubuntu/seller-app-frontend/Dockerfile"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: replace __domain__ with in nginx.conf
@@ -85,8 +89,8 @@
       copy:
         src: "{{ playbook_dir }}/../.env{{ envtype }}"
         dest: "/home/ubuntu/.env"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     - name: replace __domain__ with domain name
@@ -95,46 +99,29 @@
         regexp: "__domain_name__"
         replace: "{{ domain }}"
 
-    - name: Copy docker-compose file with domain replaced
+    - name: Copy docker compose file with domain replaced
       copy:
         src: "{{ playbook_dir }}/../docker-compose-without-ssl.yaml"
         dest: "/home/ubuntu/docker-compose.yml"
-        owner: "ubuntu"
-        group: "ubuntu"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
         mode: "0755"
 
     #sudo chmod -R a+w ~/.docker-conf/rabbitmq/log
-    - name: give permissions for rabbitmq data
-      become: yes
-      file:
-        path: "/home/ubuntu/.docker-conf/rabbitmq/data/"
-        state: directory
-        owner: ubuntu
-        group: ubuntu
-        mode: 0755
-
-    - name: give permissions for rabbitmq log
-      become: yes
-      file:
-        path: "/home/ubuntu/.docker-conf/rabbitmq/log/"
-        state: directory
-        owner: ubuntu
-        group: ubuntu
-        mode: 0755
 
     - name: docker compose up postgres
-      shell: "cd /home/ubuntu/ && sudo docker-compose up -d postgres"
+      shell: "cd /home/ubuntu/ && sudo docker compose up -d postgres"
 
     - name: docker compose postgres create db, user and password via psql and grant all privileges to schema public
-      shell: "cd /home/ubuntu/ && sudo docker-compose exec postgres psql -U postgres -c \"CREATE DATABASE  bpp_protocol;\" && sudo docker-compose exec postgres psql -U postgres -c \"CREATE USER  bpp_protocol WITH PASSWORD 'bpp_protocol';\" && sudo docker-compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON DATABASE bpp_protocol TO bpp_protocol;\" && sudo docker-compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO bpp_protocol;\""
+      shell: "cd /home/ubuntu/ && sudo docker compose exec postgres psql -U postgres -c \"CREATE DATABASE  bpp_protocol;\" && sudo docker compose exec postgres psql -U postgres -c \"CREATE USER  bpp_protocol WITH PASSWORD 'bpp_protocol';\" && sudo docker compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON DATABASE bpp_protocol TO bpp_protocol;\" && sudo docker compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO bpp_protocol;\""
       ignore_errors: yes
 
     - name: docker compose postgres create db, user and password via psql and grant all privileges to schema public
-      shell: "cd /home/ubuntu/ && sudo docker-compose exec postgres psql -U postgres -c \"CREATE DATABASE  seller_client;\" && sudo docker-compose exec postgres psql -U postgres -c \"CREATE USER  bpp_client WITH PASSWORD 'bpp_client';\" && sudo docker-compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON DATABASE seller_client TO bpp_client;\" && sudo docker-compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO bpp_client;\""
+      shell: "cd /home/ubuntu/ && sudo docker compose exec postgres psql -U postgres -c \"CREATE DATABASE  seller_client;\" && sudo docker compose exec postgres psql -U postgres -c \"CREATE USER  bpp_client WITH PASSWORD 'bpp_client';\" && sudo docker compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON DATABASE seller_client TO bpp_client;\" && sudo docker compose exec postgres psql -U postgres -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO bpp_client;\""
       ignore_errors: yes
 
     - name: Run docker compose up
-      shell: "cd /home/ubuntu/ && sudo docker-compose build && sudo docker-compose up -d"
+      shell: "cd /home/ubuntu/ && sudo docker compose build && sudo docker compose up -d"
 
     - name: run letsencrypt
       shell: "cd /home/ubuntu/ && sudo ./init-letsencrypt.sh"

@@ -1,9 +1,12 @@
 ---
 - name: Update web servers
   hosts: "{{ target }}"
-  remote_user: ubuntu
+  remote_user: "{{ remote_user }}"
 
   vars_prompt:
+    - name: remote_user
+      prompt: enter the remote host, mostly it will be ubuntu or root
+      private: no
     - name: target
       prompt: enter the hostname which you might have mentioned in host file
       private: no
