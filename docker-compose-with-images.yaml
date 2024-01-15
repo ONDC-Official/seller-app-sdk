@@ -1,7 +1,6 @@
 version: '2.4'
 
 services:
-
   bpp-protocol-webserver:
     build:
       context: seller-app-protocol/webserver
@@ -13,17 +12,27 @@ services:
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
+      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
+      BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
       BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      BAP_URI: ${BAP_URI}
       PG_HOST: ${PG_HOST}
       PG_PORT: ${PG_PORT}
       PG_DATABASE: ${PG_DATABASE}
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
+      BG_DEFAULT_URL_FLAG: True # this set the default gateway for v1.2
+      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
       FLASK_SERVER: "True"
-      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
+      DOCKER_DEFAULT_PLATFORM: ${DOCKER_DEFAULT_PLATFORM}
+    logging:
+      driver: loki:latest
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     expose:
       - 5555
     ports:
@@ -40,19 +49,20 @@ services:
     environment:
       ENV: prod
       RABBITMQ_HOST: ${RABBITMQ_HOST}
+      DOCKER_DEFAULT_PLATFORM: ${DOCKER_DEFAULT_PLATFORM}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
       BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
+      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
       PG_HOST: ${PG_HOST}
       PG_PORT: ${PG_PORT}
       PG_DATABASE: ${PG_DATABASE}
       PG_USER: ${PG_USER}
       PG_PASSWORD: ${PG_PASSWORD}
-      FLASK_SERVER: "False"
       BG_DEFAULT_URL: ${BG_DEFAULT_URL}
-      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
+      FLASK_SERVER: "False"
 
   rabbitmq:
     image: rabbitmq:3.10-management
@@ -61,10 +71,14 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
   mongo:
     image: mongo
     restart: always
+    platform: linux/arm64/v8
     ports:
       - 27017:27017
     volumes:
@@ -74,7 +88,6 @@ services:
     build:
       context: seller-app
       dockerfile: sellerDocker
-    restart: "always"
     environment:
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -85,6 +98,8 @@ services:
       SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
       MONGODB_DATABASE_HOST: mongodb://mongo
       MONGODB_DATABASE_PORT: 27017
+      BAP_URI: ${BAP_URI}
+      LOGISTICS_BAP_URI: ${LOGISTICS_BAP_URI}
       MONGODB_DATABASE_USERNAME: "root"
       MONGODB_DATABASE_PASSWORD: "root"
       MONGODB_DATABASE_NAME: "ondc-seller"
@@ -101,10 +116,14 @@ services:
       MMI_CLIENT_SECRET: ${MMI_CLIENT_SECRET}
       MMI_CLIENT_ID: ${MMI_CLIENT_ID}
       MMI_ADVANCE_API_KEY: ${MMI_ADVANCE_API_KEY}
-    volumes:
-      - ./app:/srv/app
+    #    volumes:
+    #      - ./seller-app/seller:/usr/src/app
     ports:
       - '3019:3019'
+    logging:
+      driver: loki:latest
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     depends_on:
       - mongo
     expose:
@@ -114,7 +133,6 @@ services:
     build:
       context: seller-app
       dockerfile: notificationDocker
-    restart: "always"
     environment:
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -123,9 +141,9 @@ services:
       SMTP_EMAIL_SENDER: ${SMTP_EMAIL_SENDER}
       SMTP_EXCEPTION_EMAIL_RECIPIENTS: ${SMTP_EXCEPTION_EMAIL_RECIPIENTS}
       SMTP_EMAIL_TEMPLATE_HEADER_IMAGE_PATH: ""
-      AUTH_ACCESS_JWT_SECRET: ${AUTH_ACCESS_JWT_SECRET}
       BASE_APP_NAMESPACE: "notification"
       BASE_APP_PORT: 3020
+      AUTH_ACCESS_JWT_SECRET: ${AUTH_ACCESS_JWT_SECRET}
       INTRA_SERVICE_NOTIFICAION_SERVICE_URL: http://notification:3020
       INTRA_SERVICE_SELLER_CLIENT_SERVICE_URL: http://seller-client:3001
       APP_URL: ${APP_URL}
@@ -142,7 +160,6 @@ services:
     build:
       context: seller-app
       dockerfile: sellerApiDocker
-    restart: "always"
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
       SELLER_SERVER_URL: http://seller:3019
@@ -153,33 +170,44 @@ services:
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
       BPP_URI: ${BPP_URI}
+      BAP_URI: ${BAP_URI}
+      LOGISTICS_BAP_URI: ${LOGISTICS_BAP_URI}
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
       DATABASE_NAME_SELLER_CLIENT: ${CLIENT_PG_DATABASE}
       DATABASE_USERNAME: ${CLIENT_PG_USER}
       DATABASE_PASSWORD: ${CLIENT_PG_PASSWORD}
-    volumes:
-      - ./app:/srv/app
+      LOGISTICS_DELIVERY_TYPE: ${LOGISTICS_DELIVERY_TYPE}
+      LOGISTICS_BAP_ID: ${LOGISTICS_BAP_ID}
+    logging:
+      driver: loki:latest
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     ports:
       - '3001:3001'
     depends_on:
       - seller
       - postgres
+  #    volumes:
+  #      - ./seller-app/seller:/usr/src/app
 
   postgres:
     image: postgres
+    platform: linux/amd64
     environment:
-      POSTGRES_DB: strapi
-      POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   nginx:
     build:
       context: seller-app-frontend
-      dockerfile: Dockerfile
+      dockerfile: DockerfileWithoutSSL
       args:
         REACT_APP_BASE_URL: ${REACT_APP_BASE_URL}
         REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
@@ -200,10 +228,6 @@ services:
       - "80:80"
       - "443:443"
 
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-
   seller-app-igm:
     build:
       context: seller-app-igm
@@ -211,44 +235,88 @@ services:
       PROTOCOL_BASE_URL: ${PROTOCOL_BASE_URL}
       DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
       BUGZILLA_SERVICE_URI: ${BUGZILLA_SERVICE_URI}
-      BPP_URI: ${BPP_URI}
+      SELECTED_ISSUE_CRM: ${SELECTED_ISSUE_CRM}
+      TRUDESK_BASE_URI: ${TRUDESK_BASE_URI}
       DOMAIN: ${DOMAIN}
       BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_HOST: ${PG_HOST}
+      BPP_ID: ${BPP_ID}
+      BPP_URI: ${BPP_URI}
+      SELLER_SERVER_URL: http://seller:3019
     ports:
       - "8000:8000"
     restart: always
+    logging:
+      driver: loki:latest
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+    volumes:
+      - ./seller-app-igm:/app
 
-  bugzilla-node-backend:
-    container_name: bugzilla-node-dev-seller
+  crm-node-dev-seller:
+    container_name: crm-node-dev-seller
     build:
       context: seller-bugzilla-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.production
     environment:
       ENV: prod
       BUGZILLA_API_KEY: ${BUGZILLA_API_KEY}
+      SELECTED_ISSUE_CRM: ${SELECTED_ISSUE_CRM}
+      TRUDESK_BASE_URI: ${TRUDESK_BASE_URI}
       BUGZILLA_BASE_URI: ${BUGZILLA_BASE_URI}
       BUGZILLA_ADMIN_EMAIL: ${BUGZILLA_ADMIN_EMAIL}
+      TRUDESK_USERNAME: ${TRUDESK_USERNAME}
+      TRUDESK_PASSWORD: ${TRUDESK_PASSWORD}
     ports:
       - "8001:8001"
     restart: always
 
-  bugzilla-dev-service:
-    build:
-      context: ./seller-bugzilla-service/bugzilla-main
-      dockerfile: Dockerfile
-    environment:
-      BUGZILLA_WWW: /var/www/html/bugzilla/
-      BUGZILLA_ADMIN_EMAIL: ${BUGZILLA_ADMIN_EMAIL}
-    container_name: bugzilla-dev-service-seller
-    image: shameerkc/bugzilla-dev-sqlite
+  trudesk-service:
+    expose:
+      - 8118
+    container_name: trudesk-service
+    image: polonel/trudesk:1
+    restart: always
     ports:
-      - "90:80"
-      - "5989:5900"
-
-  certbot:
-    image: certbot/certbot
-    restart: "always"
+      - "8118:8118"
+    dns:
+      - "1.1.1.1"
+      - "8.8.8.8"
+    environment:
+      NODE_ENV: production
+      TRUDESK_DOCKER: "true"
+      TD_MONGODB_SERVER: mongo
+      TD_MONGODB_DATABASE: trudesk
+      USE_XFORWARDIP: "true"
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+      - trudesk_uploads:/usr/src/trudesk/public/uploads
+      - trudesk_backups:/usr/src/trudesk/backups
+
+  elasticsearch:
+    image: elasticsearch:8.0.0
+    restart: always
+    environment:
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+    mem_limit: 1073741824
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+volumes:
+  trudesk_uploads:
+  trudesk_backups:
+  mongo:
+  mongo_data:
+  elasticsearch:
+  bpp-webserver-data:
