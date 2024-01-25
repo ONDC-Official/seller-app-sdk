@@ -29,13 +29,13 @@ A detailed user manual for the seller reference app is available [here](https://
 |                             | Handling of make-to-order items display price having base price of 0       | $${\color{green}Available}$$                      |
 |                             | Variants                                                                   | $${\color{green}Available}$$                      |
 |                             | Custom Menu                                                                | $${\color{green}Available}$$                      |
-|                             | Definition of ISN/MSN                                                      | $${\color{blue}Under \space Development}$$        |
+|                             | Definition of ISN/MSN                                                      | $${\color{green}Available}$$                      |
 |                             | Item availability schedule                                                 | $${\color{green}Available}$$                      |
 | Order tracking              | Hyperlocal - using gps coordinates                                         | $${\color{green}Available}$$                      |
 |                             | Hyperlocal & inter-city - using URL                                        | $${\color{orange}In \space future \space scope}$$ |
 |                             | Live Order Tracking                                                        | $${\color{green}Available}$$                      |
-| Order flow                  | Addition of quote type                                                     | $${\color{blue}Under \space Development}$$        |
-|                             | Updated /confirm, /on_confirm flow                                         | $${\color{blue}Under \space Development}$$        |
+| Order flow                  | Addition of quote type                                                     | $${\color{green}Available}$$                      |
+|                             | Updated /confirm, /on_confirm flow                                         | $${\color{green}Available}$$                      |
 |                             | Customization (input - selection: all pre-order APIs)                      | $${\color{green}Available}$$                      |
 |                             | Customization (input - free text: all pre-order APIs)                      | $${\color{orange}In \space future \space scope}$$ |
 |                             | Customization (input - selection: all post-order APIs)                     | $${\color{green}Available}$$                      |
@@ -80,7 +80,7 @@ A detailed user manual for the seller reference app is available [here](https://
 |                             | Communication from buyer NP to seller NP (catalog ingestion feedback, etc) | $${\color{orange}In \space future \space scope}$$ |
 | Rating                      | rating, on_rating                                                          | $${\color{orange}In \space future \space scope}$$ |
 | Others                      | /info, /on_info APIs                                                       | $${\color{orange}In \space future \space scope}$$ |
-|                             | Off Network Logistics Option                                               | $${\color{orange}In \space future \space scope}$$ |
+|                             | Off Network Logistics Option                                               | $${\color{blue}Under \space Development}$$        |
 |                             | Option to select logistics delivery type                                   | $${\color{green}Available}$$                      |
 |                             | Bhashini Integration                                                       | $${\color{orange}In \space future \space scope}$$ |
 | Catalog Indexing            |                                                                            | $${\color{orange}In \space future \space scope}$$ |
