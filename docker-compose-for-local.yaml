@@ -25,6 +25,7 @@ services:
       PG_PASSWORD: ${PG_PASSWORD}
       FLASK_SERVER: "True"
       DOCKER_DEFAULT_PLATFORM: ${DOCKER_DEFAULT_PLATFORM}
+      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
     expose:
       - 5555
     ports:
