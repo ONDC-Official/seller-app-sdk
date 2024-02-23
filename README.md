@@ -189,7 +189,7 @@ https://atlas.mappls.com/api/places/geocode
     "subscriber_id": "https://integration-qa.gofrugalretail.com/ecommerce/ondc6",
     "subscriber_url": "https://integration-qa.gofrugalretail.com/ecommerce/ondc8",
     "domain": "nic2004:521109",
-    "signing_public_key": "SIGNING_PRIVATE_KEY",
+    "signing_public_key": "SIGNING_PUBLIC_KEY",
     "encr_public_key": "CRYPTO_PUBLICKEY",
     "created": "2021-11-09T05:56:52.470Z2",
     "valid_from": "2021-11-10T05:56:52.470Z3",
