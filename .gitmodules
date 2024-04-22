@@ -1,12 +1,12 @@
 [submodule "seller-app"]
-    path = seller-app
-    url = https://github.com/ONDC-Official/seller-app.git
+	path = seller-app
+	url = https://github.com/ONDC-Official/seller-app.git
 [submodule "seller-app-protocol"]
-    path = seller-app-protocol
-    url = https://github.com/ONDC-Official/seller-app-protocol.git
+	path = seller-app-protocol
+	url = https://github.com/ONDC-Official/seller-app-protocol.git
 [submodule "seller-app-frontend"]
-    path = seller-app-frontend
-    url = https://github.com/ONDC-Official/seller-app-frontend.git
+	path = seller-app-frontend
+	url = https://github.com/ONDC-Official/seller-app-frontend.git
 [submodule "seller-app-igm"]
 	path = seller-app-igm
 	url = https://github.com/ONDC-Official/seller-app-igm.git
