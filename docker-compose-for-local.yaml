@@ -8,69 +8,25 @@ services:
       dockerfile: dockerfile
     container_name: bpp-protocol-webserver
     depends_on:
-      - rabbitmq
-      - postgres
+      - mongo
     environment:
       ENV: prod
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
       BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
       BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
       BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
       BPP_ID: ${BPP_ID}
-      PG_HOST: ${PG_HOST}
-      PG_PORT: ${PG_PORT}
-      PG_DATABASE: ${PG_DATABASE}
-      PG_USER: ${PG_USER}
-      PG_PASSWORD: ${PG_PASSWORD}
-      FLASK_SERVER: "True"
-      DOCKER_DEFAULT_PLATFORM: ${DOCKER_DEFAULT_PLATFORM}
+      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
+      MONGO_DATABASE_HOST: ${MONGO_DATABASE_HOST}
+      REGISTRY_BASE_URL: ${REGISTRY_BASE_URL}
+      VERIFICATION_ENABLE: ${VERIFICATION_ENABLE}
     expose:
       - 5555
     ports:
       - 5555:5555
 
-  bpp-protocol-consumer:
-    build:
-      context: seller-app-protocol/webserver
-      dockerfile: consumer_dockerfile
-    container_name: bpp-protocol-consumer
-    depends_on:
-      - rabbitmq
-      - postgres
-    environment:
-      ENV: prod
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      DOCKER_DEFAULT_PLATFORM: ${DOCKER_DEFAULT_PLATFORM}
-      BPP_PRIVATE_KEY: ${BPP_PRIVATE_KEY}
-      BPP_PUBLIC_KEY: ${BPP_PUBLIC_KEY}
-      BPP_UNIQUE_KEY_ID: ${BPP_UNIQUE_KEY_ID}
-      BPP_ID: ${BPP_ID}
-      BPP_CLIENT_ENDPOINT: ${BPP_CLIENT_ENDPOINT}
-      IGM_CLIENT_ENDPOINT: ${IGM_CLIENT_ENDPOINT}
-      PG_HOST: ${PG_HOST}
-      PG_PORT: ${PG_PORT}
-      PG_DATABASE: ${PG_DATABASE}
-      PG_USER: ${PG_USER}
-      PG_PASSWORD: ${PG_PASSWORD}
-      BG_DEFAULT_URL: ${BG_DEFAULT_URL}
-      FLASK_SERVER: "False"
-
-  rabbitmq:
-    image: rabbitmq:3.10-management
-    container_name: rabbitmq
-    hostname: rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-
   mongo:
     image: mongo
     restart: always
-    platform: linux/arm64/v8
     ports:
       - 27017:27017
     volumes:
@@ -80,6 +36,7 @@ services:
     build:
       context: seller-app
       dockerfile: sellerDocker
+    restart: "always"
     environment:
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -119,6 +76,7 @@ services:
     build:
       context: seller-app
       dockerfile: notificationDocker
+    restart: "always"
     environment:
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
@@ -146,6 +104,7 @@ services:
     build:
       context: seller-app
       dockerfile: sellerApiDocker
+    restart: "always"
     environment:
       FIREBASE_SERVICE_ACCOUNT_JSON_PATH: lib/config/firebase-service-account.json
       SELLER_SERVER_URL: http://seller:3019
@@ -180,8 +139,6 @@ services:
     volumes:
       - ./postgres_init_scripts/:/docker-entrypoint-initdb.d/
       - ./data/postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   nginx:
     build:
@@ -253,3 +210,4 @@ services:
     ports:
       - "90:80"
       - "5989:5900"
+
